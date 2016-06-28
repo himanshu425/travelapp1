@@ -1,0 +1,8 @@
+package tr.mapsdemo;
+
+/**
+ * Created by 1257075 on 6/24/2016.
+ */
+public interface Connection {
+    public void callback(String url);
+}

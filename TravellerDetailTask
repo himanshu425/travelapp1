@@ -1,0 +1,47 @@
+package tr.mapsdemo;
+
+import android.content.Context;
+import android.os.AsyncTask;
+import android.widget.Toast;
+
+/**
+ * Created by 1257075 on 6/24/2016.
+ */
+public class TravllerDetailsTask extends AsyncTask<String,Void,Long> {
+    Context context;
+    String Location,CheckIN,CheckOut;
+    int NumberPicker;
+    DBHelp dbHelper;
+
+   long result;
+
+
+    public TravllerDetailsTask(Context context, String location, String checkIN, String checkOut, int numberPicker, DBHelp dbHelper) {
+        this.context = context;
+        Location = location;
+        CheckIN = checkIN;
+        CheckOut = checkOut;
+        NumberPicker = numberPicker;
+        this.dbHelper = dbHelper;
+    }
+
+    @Override
+    protected Long doInBackground(String... params) {
+        result=dbHelper.insertData(Location,CheckIN,CheckOut,NumberPicker);
+        return result;
+    }
+
+    @Override
+    protected void onPostExecute(Long aLong) {
+        super.onPostExecute(aLong);
+        if(aLong==-1)
+        {
+            Toast.makeText(context, "Data not Inserted", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(context, "Data Inserted", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+
+

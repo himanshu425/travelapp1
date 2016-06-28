@@ -1,0 +1,9 @@
+package tr.mapsdemo;
+
+/**
+ * Created by 1257075 on 6/27/2016.
+ */
+public interface Callback {
+
+    public void callBack(int option);
+}

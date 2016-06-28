@@ -1,0 +1,67 @@
+package tr.mapsdemo;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
+
+/**
+ * Created by 1257075 on 6/24/2016.
+ */
+ class DBHelp extends SQLiteOpenHelper implements BaseColumns {
+    private static final String DATABASE_NAME = "TRAVEL";
+    private static final int DATABASE_VERSION = 1;
+    public static final String TABLE_NAME = "USER_TRAVLER_DETAILS";
+    public static final String PATH = "PATH";
+
+
+    public static final String COL_2 = "LOCATION";
+    public static final String COL_3 = "CHECKIN";
+    public static final String COL_4 = "CHECKOUT";
+    public static final String COL_5 = "NUMBEROFTRAVELLER";
+
+
+
+    public DBHelp(Context context) {
+        super(context, DATABASE_NAME, null, 3);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(
+                "create table " + TABLE_NAME + "("
+                        + _ID + " integer primary key autoincrement, "
+                        + COL_2 + " text not null ,"
+                        + COL_3 + " text not null ,"
+                        + COL_4 + " text not null ,"
+                        + COL_5 + " text not null);"
+
+        );
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+
+    }
+
+    public long insertData(String Location,String CheckIN,String CheckOut,int NumberPicker) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(COL_2, Location);
+        contentValues.put(COL_3, CheckIN);
+        contentValues.put(COL_4, CheckOut);
+        contentValues.put(COL_5, NumberPicker);
+
+
+
+        long result = db.insert(TABLE_NAME, null, contentValues);
+        return result;
+    }
+}

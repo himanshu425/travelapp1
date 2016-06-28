@@ -1,0 +1,356 @@
+homescreen
+package tr.mapsdemo;
+
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Build;
+import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.NumberPicker;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.List;
+
+public class HomeScreen extends FragmentActivity implements View.OnClickListener {
+
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+
+    Button btnSearch,btnHotelDetails;
+    EditText mDisplayDatechkIn, mDisplayDatechkOut;
+    TextView mtxtTravllerRoom;
+    Button mBtnTravellerRoom;
+    NumberPicker mNumberPicker;
+    List<Address> addresses;
+    EditText location;
+    int newValfornumberPicker;
+    int CheckinDate;
+    String locations;
+
+    private Button mCheckInTime,mCheckOutTime;
+
+    private int mYear;
+    private int mMonth;
+    private int mDay;
+    private int mpresentDay;
+    private int mpresentYear;
+    private int mpresentMonth;
+    int cur = 0;
+    DBHelp dbHelp;
+
+
+    static final int INDATE_DIALOG_ID = 999;
+    static final int OUTDATE_DIALOG_ID = 888;
+    String CheckIn,CheckOut,NumberofTravller;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_homescreen);
+        Button button=(Button)findViewById(R.id.movetoslider);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(HomeScreen.this,HomeDetailScreen.class);
+                startActivity(intent);
+            }
+        });
+        location = (EditText) findViewById(R.id.edtLocation);
+        locations = location.getText().toString();
+
+
+
+        //ForStoringDataInTravellerDetailsTask
+       //CheckIn=mDisplayDatechkIn.getText().toString();
+      //CheckOut=mDisplayDatechkOut.getText().toString();
+         dbHelp=new DBHelp(HomeScreen.this);
+
+
+
+
+        btnSearch = (Button) findViewById(R.id.btnSearch);
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                Toast.makeText(HomeScreen.this, "chal raha h", Toast.LENGTH_SHORT).show();
+                if (locations != null || !location.equals("null")) {
+                    Toast.makeText(HomeScreen.this, "IN Location got", Toast.LENGTH_SHORT).show();
+                    //Geo codder=
+                    //regeocodder
+                    Geocoder geocoder = new Geocoder(HomeScreen.this);
+                    try {
+                        addresses = geocoder.getFromLocationName(locations, 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Address address = addresses.get(0);
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                }
+
+            }
+        });
+
+        mDisplayDatechkIn = (EditText) findViewById(R.id.txtViewcheckin);
+
+        mCheckInTime = (Button) findViewById(R.id.Btncheckin);
+        mDisplayDatechkOut = (EditText) findViewById(R.id.txtViewchkOut);
+
+        mCheckOutTime = (Button) findViewById(R.id.btnchkout);
+        setCurrentDateOnView();
+
+        addListenerOnButton();
+
+        //number picker
+        mtxtTravllerRoom =(TextView)findViewById(R.id.TxtNumberroom);
+        mBtnTravellerRoom =(Button)findViewById(R.id.btnTrvlrroom);
+        mBtnTravellerRoom.setOnClickListener(this);
+        setUpMapIfNeeded();
+        btnHotelDetails=(Button)findViewById(R.id.btnHotelDetails);
+        btnHotelDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NumberofTravller=String.valueOf(newValfornumberPicker);
+
+
+                new TravllerDetailsTask(HomeScreen.this,locations,CheckIn,CheckOut,newValfornumberPicker,dbHelp).execute();
+                Intent intent=new Intent(HomeScreen.this,HotelListView.class);
+                startActivity(intent);
+
+            }
+        });
+
+    }
+    public void setCurrentDateOnView() {
+
+        // mDisplayDatechkIn = (TextView) findViewById(R.id.txtViewcheckin);
+
+        final Calendar c = Calendar.getInstance();
+        mYear= mpresentYear = c.get(Calendar.YEAR);
+        mMonth= mpresentMonth = c.get(Calendar.MONTH);
+        mDay = mpresentDay = c.get(Calendar.DAY_OF_MONTH);
+
+        // set current date into textview
+        mDisplayDatechkIn.setText(new StringBuilder()
+                // Month is 0 based, just add 1
+                .append(mMonth + 1).append("-").append(mDay).append("-")
+                .append(mYear).append(" "));
+        mDisplayDatechkOut.setText(new StringBuilder()
+                // Month is 0 based, just add 1
+                .append(mMonth + 1).append("-").append(mDay).append("-")
+                .append(mYear).append(" "));
+    }
+    public void addListenerOnButton() {
+        mCheckInTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cur = INDATE_DIALOG_ID;
+                showDialog(INDATE_DIALOG_ID);
+            }
+        });
+        mCheckOutTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cur = OUTDATE_DIALOG_ID;
+                showDialog(OUTDATE_DIALOG_ID);
+            }
+        });
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        DatePickerDialog res=null;
+        switch (id) {
+            case INDATE_DIALOG_ID:
+                // set date picker as current date
+                cur = INDATE_DIALOG_ID;
+                DatePickerDialog _date =   new DatePickerDialog(this, datePickerListener, mYear,mMonth,
+                        mDay){
+                    @Override
+                    public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+                    {
+                        if (year < mpresentYear)
+                            view.updateDate(mYear, mMonth, mDay);
+
+                        if (monthOfYear < mpresentMonth && year == mpresentYear)
+                            view.updateDate(mYear, mMonth, mDay);
+
+                        if (dayOfMonth < mpresentDay && year == mpresentYear && monthOfYear == mpresentMonth)
+                            view.updateDate(mYear, mMonth, mDay);
+
+                    }
+                };
+
+                res=_date;
+
+                break;
+
+            case OUTDATE_DIALOG_ID:
+                cur = OUTDATE_DIALOG_ID;
+                DatePickerDialog _date1 =   new DatePickerDialog(this, datePickerListener, mYear,mMonth,
+                        mDay){
+                    @Override
+                    public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+                    {
+                        if (year < mYear)
+                            view.updateDate(mYear, mMonth, mDay);
+
+                        if (monthOfYear < mMonth && year == mYear)
+                            view.updateDate(mYear, mMonth, mDay);
+
+                        if (dayOfMonth < mDay && year == mYear && monthOfYear == mMonth)
+                            view.updateDate(mYear, mMonth, mDay);
+
+                    }
+                };
+
+                res= _date1;
+                break;
+
+        }
+        return res;
+    }
+
+    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
+
+        // when dialog box is closed, below method will be called.
+        public void onDateSet(DatePicker view, int selectedYear,
+                              int selectedMonth, int selectedDay) {
+            mYear = selectedYear;
+            mMonth = selectedMonth;
+            mDay = selectedDay;
+
+            // set selected date into textview
+            if (cur == INDATE_DIALOG_ID) {
+                mDisplayDatechkIn.setText(new StringBuilder().append(mMonth + 1)
+                        .append("-").append(mDay).append("-").append(mYear)
+                        .append(" "));
+                CheckIn=mDisplayDatechkIn.getText().toString();
+            }
+            else {
+                mDisplayDatechkOut.setText(new StringBuilder().append(mMonth + 1)
+                        .append("-").append(mDay).append("-").append(mYear)
+                        .append(" "));
+                CheckOut=mDisplayDatechkOut.getText().toString();
+
+            }
+
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setUpMapIfNeeded();
+    }
+
+    /**
+     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
+     * installed) and the map has not already been instantiated.. This will ensure that we only ever
+     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * <p/>
+     * If it isn't installed {@link SupportMapFragment} (and
+     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
+     * install/update the Google Play services APK on their device.
+     * <p/>
+     * A user can return to this FragmentActivity after following the prompt and correctly
+     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
+     * have been completely destroyed during this process (it is likely that it would only be
+     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
+     * method in {@link #onResume()} to guarantee that it will be called.
+     */
+    private void setUpMapIfNeeded() {
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mMap == null) {
+            // Try to obtain the map from the SupportMapFragment.
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                    .getMap();
+            // Check if we were successful in obtaining the map.
+            if (mMap != null) {
+                setUpMap();
+            }
+        }
+    }
+
+    /**
+     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
+     * just add a marker near Africa.
+     * <p/>
+     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     */
+    private void setUpMap() {
+        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        //Current Location
+        mMap.setMyLocationEnabled(true);
+
+    }
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @Override
+    public void onClick(View v) {
+        numberPickerDialod();
+
+
+
+    }
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public void numberPickerDialod()
+    {
+        mNumberPicker =new NumberPicker(this);
+        mNumberPicker.setMaxValue(100);
+        mNumberPicker.setMinValue(0);
+        NumberPicker.OnValueChangeListener onValueChangeListener=new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                newValfornumberPicker=newVal;
+                mtxtTravllerRoom.setText("" + newVal);
+
+
+            }
+
+        };
+        mNumberPicker.setOnValueChangedListener(onValueChangeListener);
+        final AlertDialog.Builder builder= new AlertDialog.Builder(this).setView(mNumberPicker);
+        builder.setTitle("NUMBER OF TRAVELLER")
+                .setIcon(R.drawable.ic_launcher);
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+                Toast.makeText(HomeScreen.this, "Number is Selected", Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        builder.show();
+    }
+}

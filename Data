@@ -1,0 +1,47 @@
+package tr.mapsdemo;
+
+/**
+ * Created by 1257075 on 6/24/2016.
+ */
+public class Data {
+    private String  name, location, price , amenities;
+
+    public Data(String name, String location, String price, String amenities) {
+        this.name = name;
+        this.location = location;
+        this.price = price;
+        this.amenities = amenities;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getAmenities() {
+        return amenities;
+    }
+
+    public void setAmenities(String amenities) {
+        this.amenities = amenities;
+    }
+}

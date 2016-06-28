@@ -1,0 +1,266 @@
+package tr.mapsdemo;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class HotelListView extends AppCompatActivity implements Connection,Callback{
+    RecyclerView recyclerView;
+
+
+    DataAdapter adapter;
+    public static List<Data> datas=new ArrayList<Data>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_hotel_list_view);
+        Toolbar toolbar=(Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        recyclerView=(RecyclerView)findViewById(R.id.recycler_view);
+
+        LinearLayoutManager layoutManager=new LinearLayoutManager(HotelListView.this);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter= new DataAdapter(datas,HotelListView.this);
+        recyclerView.setAdapter(adapter);
+
+        new DataAsync(HotelListView.this).execute("https://maps.googleapis.com/maps/api/place/radarsearch/json?location=51.503186,-0.126446&radius=5000&type=hotel&key=AIzaSyCHQ1-BVjPYo4dYAwja");
+
+
+    }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_hotel_list_view, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void callback(String url) {
+        try {
+            JSONObject jsonObject=new JSONObject(url);
+            JSONArray jsonArray=jsonObject.getJSONArray("results");
+
+            for(int i=0;i<jsonArray.length();i++){
+                JSONObject Object=jsonArray.getJSONObject(i);
+
+                String name=Object.getString("id");
+                String location=Object.getString("description");
+                String price=Object.getString("price");
+                String anemities=Object.getString("rateing");
+                Data emp=new Data(name,location,price,anemities);
+                datas.add(emp);
+            }
+
+
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void callBack(int option) {
+
+
+            switch (option)
+            {
+                case 1:
+                    Toast.makeText(getApplicationContext(),"Case 1 IS Clicked",Toast.LENGTH_SHORT).show();
+
+                    break;
+                case 2:
+                    Toast.makeText(getApplicationContext(),"Case 2 IS Clicked",Toast.LENGTH_SHORT).show();
+
+
+
+                    break;
+
+
+
+            }
+
+        }
+    }
+
+/*
+try {
+        JSONObject jsonObject=new JSONObject(str);
+        JSONArray jsonArray=jsonObject.getJSONArray("hotels");
+        for(int i=0;i<jsonArray.length();i++){
+        JSONObject hotelObject=jsonArray.getJSONObject(i);
+        String hotelname=hotelObject.getString("name");
+        HotelDetails hotel=new HotelDetails(hotelname);
+        sDetailsList.add(hotel);}
+
+
+        } catch (JSONException e) {
+        e.printStackTrace();
+        }*/
+# travelapp1package tr.mapsdemo;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class HotelListView extends AppCompatActivity implements Connection,Callback{
+    RecyclerView recyclerView;
+
+
+    DataAdapter adapter;
+    public static List<Data> datas=new ArrayList<Data>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_hotel_list_view);
+        Toolbar toolbar=(Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        recyclerView=(RecyclerView)findViewById(R.id.recycler_view);
+
+        LinearLayoutManager layoutManager=new LinearLayoutManager(HotelListView.this);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter= new DataAdapter(datas,HotelListView.this);
+        recyclerView.setAdapter(adapter);
+
+        new DataAsync(HotelListView.this).execute("https://maps.googleapis.com/maps/api/place/radarsearch/json?location=51.503186,-0.126446&radius=5000&type=hotel&key=AIzaSyCHQ1-BVjPYo4dYAwja");
+
+
+    }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_hotel_list_view, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void callback(String url) {
+        try {
+            JSONObject jsonObject=new JSONObject(url);
+            JSONArray jsonArray=jsonObject.getJSONArray("results");
+
+            for(int i=0;i<jsonArray.length();i++){
+                JSONObject Object=jsonArray.getJSONObject(i);
+
+                String name=Object.getString("id");
+                String location=Object.getString("description");
+                String price=Object.getString("price");
+                String anemities=Object.getString("rateing");
+                Data emp=new Data(name,location,price,anemities);
+                datas.add(emp);
+            }
+
+
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void callBack(int option) {
+
+
+            switch (option)
+            {
+                case 1:
+                    Toast.makeText(getApplicationContext(),"Case 1 IS Clicked",Toast.LENGTH_SHORT).show();
+
+                    break;
+                case 2:
+                    Toast.makeText(getApplicationContext(),"Case 2 IS Clicked",Toast.LENGTH_SHORT).show();
+
+
+
+                    break;
+
+
+
+            }
+
+        }
+    }
+
+/*
+try {
+        JSONObject jsonObject=new JSONObject(str);
+        JSONArray jsonArray=jsonObject.getJSONArray("hotels");
+        for(int i=0;i<jsonArray.length();i++){
+        JSONObject hotelObject=jsonArray.getJSONObject(i);
+        String hotelname=hotelObject.getString("name");
+        HotelDetails hotel=new HotelDetails(hotelname);
+        sDetailsList.add(hotel);}
+
+
+        } catch (JSONException e) {
+        e.printStackTrace();
+        }*/

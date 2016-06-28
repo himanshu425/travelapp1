@@ -1,0 +1,88 @@
+package tr.mapsdemo;
+
+/**
+ * Created by 1257075 on 6/24/2016.
+ */
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MyViewHolder>  {
+    public static  ViewGroup parent;
+    Context context;
+    List<Data> datas=new ArrayList<Data>();
+
+    public DataAdapter(List<Data> datas, HotelListView hotelListView) {
+        this.datas = datas;
+        this.context=hotelListView;
+    }
+
+    @Override
+    public MyViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View view= LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_rc,viewGroup,false);
+        return new MyViewHolder(view);
+
+    }
+
+    @Override
+    public void onBindViewHolder(MyViewHolder myViewHolder, int i) {
+        myViewHolder.txtName.setText(datas.get(i).getName());
+        myViewHolder.txtLocation.setText(datas.get(i).getLocation());
+        myViewHolder.txtLocation.setText(datas.get(i).getPrice());
+        myViewHolder.txtLocation.setText(datas.get(i).getAmenities());
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return datas.size();
+    }
+
+
+
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        Connection connection;
+        Callback main;
+        TextView txtName, txtLocation, txtPrice, txtAmenties;
+        public MyViewHolder(View itemView) {
+            super(itemView);
+            connection=(Connection)context;
+            txtName =(TextView)itemView.findViewById(R.id.Name);
+            txtLocation =(TextView)itemView.findViewById(R.id.Location);
+            txtPrice =(TextView)itemView.findViewById(R.id.Price);
+            txtAmenties =(TextView)itemView.findViewById(R.id.locationDescription);
+            main=(Callback)parent.getContext();
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switch (getPosition())
+                    {
+                        case 1:
+                            main.callBack(0);
+                            break;
+                        case 2:
+                            main.callBack(1);
+                            break;
+
+
+                    }
+                }
+            });
+
+
+        }
+
+
+
+
+
+    }
+
+}
